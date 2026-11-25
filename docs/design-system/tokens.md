@@ -1,6 +1,6 @@
 # Design Tokens
 
-All design tokens are centrally enforced in [tailwind.config.js](../../tailwind.config.js), [global.css](../../global.css), and [src/lib/theme.ts](../../src/lib/theme.ts).
+All design tokens are centrally enforced in [tailwind.config.js](../../tailwind.config.js), [global.css](../../global.css), and [src/shared/lib/theme.ts](../../src/shared/lib/theme.ts).
 
 ---
 
@@ -23,13 +23,13 @@ Extremely restrained dark-mode palette: deep obsidian-charcoal, off-white, neutr
 ### Color Rules
 - Purple (`accent`, `accent-soft`, `accent-foreground`) must remain an accent, never the dominant background or primary CTA color.
 - Do not add unrelated saturated colors (bright red, green, blue, yellow). Communicate errors/status via calm surfaces (`bg-surface-muted` / `bg-accent-soft`), clear copy, and accessibility roles (`accessibilityRole="alert"`).
-- Always use `THEME` from `@/lib/theme` when JS values are needed (e.g., `ActivityIndicator` `color`, `placeholderTextColor`, `selectionColor`, navigation `ThemeProvider`).
+- Always use `THEME` from `@/shared/lib/theme` when JS values are needed (e.g., `ActivityIndicator` `color`, `placeholderTextColor`, `selectionColor`, navigation `ThemeProvider`).
 
 ---
 
 ## 2. Typography System (Strictly 3 Roles)
 
-Implemented via `fontSize` in `tailwind.config.js` and the `<Text variant="..." />` component in `src/components/ui/text.tsx`. `tailwind.config.js` restricts `fontSize` to these three roles only and `fontWeight` to `normal` (`400`) and `semibold` (`600`).
+Implemented via `fontSize` in `tailwind.config.js` and the `<Text variant="..." />` component in `src/shared/components/ui/text.tsx`. `tailwind.config.js` restricts `fontSize` to these three roles only and `fontWeight` to `normal` (`400`) and `semibold` (`600`).
 
 | Role | Class | Size | Line Height | Weight | Purpose |
 |---|---|---:|---:|---:|---|

@@ -8,8 +8,9 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { ActivityIndicator, Platform, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { NAV_THEME, THEME } from '@/lib/theme';
-import { AuthProvider, useAuth } from '@/providers/auth-provider';
+import { AuthBootstrapper, useAuth } from '@/features/auth';
+import { QueryProvider } from '@/shared/infrastructure/query/query-provider';
+import { NAV_THEME, THEME } from '@/shared/lib/theme';
 
 void SplashScreen.preventAutoHideAsync();
 
@@ -42,7 +43,7 @@ function RootNavigator() {
       }}
     >
       <Stack.Screen name="index" />
-      <Stack.Protected guard={!isAuthenticated} redirectTo="/profile">
+      <Stack.Protected guard={!isAuthenticated} redirectTo="/journals">
         <Stack.Screen name="login" options={{ title: 'Sign In' }} />
       </Stack.Protected>
       <Stack.Protected guard={isAuthenticated} redirectTo="/login">
@@ -56,11 +57,13 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ThemeProvider value={NAV_THEME}>
-        <AuthProvider>
-          <StatusBar style="light" />
-          <RootNavigator />
-          <PortalHost />
-        </AuthProvider>
+        <QueryProvider>
+          <AuthBootstrapper>
+            <StatusBar style="light" />
+            <RootNavigator />
+            <PortalHost />
+          </AuthBootstrapper>
+        </QueryProvider>
       </ThemeProvider>
     </GestureHandlerRootView>
   );

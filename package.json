@@ -4,11 +4,13 @@
   "main": "expo-router/entry",
   "dependencies": {
     "@expo/ui": "~58.0.29",
+    "@hookform/resolvers": "^7.0.9",
     "@react-native-async-storage/async-storage": "2.2.0",
     "@rn-primitives/dialog": "^1.5.2",
     "@rn-primitives/portal": "^1.5.3",
     "@rn-primitives/slot": "^1.5.2",
     "@supabase/supabase-js": "^2.119.2",
+    "@tanstack/react-query": "^5.108.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "expo": "~58.0.26",
@@ -27,6 +29,7 @@
     "nativewind": "4.2.7",
     "react": "19.3.0",
     "react-dom": "19.3.0",
+    "react-hook-form": "^7.92.0",
     "react-native": "0.88.1",
     "react-native-gesture-handler": "~3.3.0",
     "react-native-reanimated": "4.7.1",
@@ -35,7 +38,9 @@
     "react-native-web": "~0.21.4",
     "react-native-worklets": "0.13.0",
     "tailwind-merge": "^3.7.1",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "valibot": "^1.5.0",
+    "zustand": "^5.1.0"
   },
   "devDependencies": {
     "@types/react": "~19.3.0",
@@ -43,7 +48,8 @@
     "eslint-config-expo": "~58.0.4",
     "supabase": "^3.4.0",
     "tailwindcss": "^3.4.17",
-    "typescript": "~6.0.3"
+    "typescript": "~6.0.3",
+    "vitest": "^5.1.1"
   },
   "scripts": {
     "start": "expo start",
@@ -51,9 +57,21 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "lint": "expo lint",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "db:link": "supabase link --project-ref isjafkdnfwtscabinzyh",
+    "db:start": "supabase start",
+    "db:stop": "supabase stop",
+    "db:reset": "supabase db reset",
+    "db:migrations": "supabase migration list --remote=isjafkdnfwtscabinzyh",
+    "db:migration:new": "supabase migration new",
     "db:push": "supabase db push --remote=isjafkdnfwtscabinzyh",
-    "db:types": "supabase gen types typescript --project-id isjafkdnfwtscabinzyh > src/types/database.types.ts",
-    "supabase:config:push": "supabase config push"
+    "db:pull": "supabase db pull --remote=isjafkdnfwtscabinzyh",
+    "db:diff": "supabase db diff --remote=isjafkdnfwtscabinzyh",
+    "db:query": "supabase db query --remote=isjafkdnfwtscabinzyh",
+    "db:advisors": "supabase db advisors --remote=isjafkdnfwtscabinzyh",
+    "db:types": "supabase gen types typescript --remote=isjafkdnfwtscabinzyh > src/shared/types/database.types.ts",
+    "supabase:config:push": "supabase config push --remote=isjafkdnfwtscabinzyh"
   },
   "private": true
 }

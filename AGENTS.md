@@ -1,52 +1,79 @@
 # Lucid Up — Agent Instructions
 
-**Lucid Up** is a calm, minimal, editorial journal mobile app built with **Expo (SDK 58)**, **React Native**, **Expo Router**, **NativeWind v4** (React Native Reusables), and **Supabase** (`npm` project; `package-lock.json` is the lockfile).
+**Lucid Up** is a calm, minimal, editorial journal mobile app built with **Expo (SDK 58)**, **React Native (0.88)**, **Expo Router**, **NativeWind v4** (React Native Reusables), **Supabase**, **Zustand**, **TanStack Query**, **React Hook Form**, and **Valibot** (`npm` project; `package-lock.json` is the lockfile).
 
-## Workspace Skills (`.agents/skills/`)
+## Architecture Overview
 
-Activate the matching skill **before** planning or editing files in that domain. Do not duplicate or override skill procedures from memory.
+Code lives under `src/` (`@/*` -> `./src/*`) in three top-level directories:
 
-| Task / Trigger | Skill to Load | Key References |
+```text
+src/
+├── app/        # Expo Router routes & _layout.tsx navigators ONLY (thin entrypoints)
+├── features/   # Self-contained feature modules (auth, profile, journals)
+└── shared/     # Reusable cross-feature UI, form helpers, theme, infra, types, utils
+```
+
+### Feature Layers (Pragmatic Clean Architecture)
+
+Each module in `src/features/<feature>/` separates responsibilities cleanly:
+
+- **`domain/`**: Entities, constants, repository contracts, and Valibot validation schemas. Pure TypeScript (+ `valibot` only); never imports React, Expo, Zustand, TanStack Query, or Supabase.
+- **`application/`**: Use cases (accepting repository contracts) and feature-owned Zustand client stores (when needed).
+- **`infrastructure/`**: Repository implementations (`supabase` adapters) and DB-row-to-entity mappers.
+- **`presentation/`**: Screens, feature components, and TanStack Query / form hooks.
+- **`index.ts`**: Public barrel file. Cross-feature imports must go through `@/features/<feature>` only—never deep-import another feature's internal layers.
+
+## Core Library Responsibilities
+
+| Library | Responsibility | Where It Lives |
 |---|---|---|
-| Screens, layouts, journal UX, navigation chrome, accessibility, keyboard, RTL/LTR | `ui-ux-design-principles` | [docs/design-system/README.md](docs/design-system/README.md), [docs/design-system/components.md](docs/design-system/components.md) |
-| Theme tokens, colors, 3-role typography, spacing, radii, `global.css`, `tailwind.config.js`, `src/lib/theme.ts` | `design-system-tokens` | [docs/design-system/tokens.md](docs/design-system/tokens.md) |
-| Adding or editing `@/components/ui/*` primitives (RNR + NativeWind v4) | `nativewind-reusables-components` | [components.json](components.json), `src/components/ui/` |
-| Supabase Auth, client queries, migrations, CLI/MCP, Edge Functions, debugging | `supabase` | [supabase/config.jsonc](supabase/config.jsonc), [src/utils/supabase.ts](src/utils/supabase.ts) |
-| Postgres tables, columns, indexes, RLS policies, functions, query tuning | `supabase-postgres-best-practices` | `.agents/skills/supabase-postgres-best-practices/references/` |
+| **Zustand** | Client-side global runtime state & shared UI state (e.g., `useAuthStore`) | `<feature>/application/stores/` |
+| **TanStack Query** | All server state, caching, query keys, synchronization, and mutations | `<feature>/presentation/hooks/` |
+| **React Hook Form** | Form state, submission handling, and `ConfirmDialog` gating | `<feature>/presentation/screens/` & `shared/components/form/` |
+| **Valibot** | Schema definitions, runtime validation, and inferred input/output types | `<feature>/domain/schemas/` |
 
-## Non-Negotiable Rules
+## Rules & Skills (`.agents/`)
 
-### 1. Expo & React Native
-- **Verify current SDK docs**: Expo ships breaking changes every SDK release. Before touching Expo, EAS, or RN APIs, check `expo` in [package.json](package.json) (`~58.x`) and consult `https://docs.expo.dev/versions/v58.0.0/` or `https://docs.expo.dev/llms.txt` — never rely on memory.
-- **Dependencies**: Always install Expo/RN packages via `npx expo install <package>` (never raw `npm install`). Prefer recommended Expo modules over third-party libraries.
-- **Routing (`src/app/`)**: Use **Expo Router** (`Link`, `router`, `useLocalSearchParams` from `expo-router`). Keep only routes and `_layout.tsx` navigators inside `src/app/`; keep components, hooks, lib, providers, types, and utils outside `src/app/` (use `@/*` -> `./src/*`).
-- **Native / CNG & EAS**: Do not create or hand-edit `ios/` or `android/` when using Continuous Native Generation — configure native behavior in [app.json](app.json) and config plugins. Libraries with native code require a development build (`npx expo run:ios|android` or `npx eas-cli@latest build --profile development`).
+Persistent rules live in `.agents/rules/` and task workflows live in `.agents/skills/`. Load the matching skill before planning or editing files in that domain:
 
-### 2. UI/UX & Design System
-- **NativeWind + React Native Reusables first**: Always style with **NativeWind v4** (`className` + `cn()`) and build UI with **React Native Reusables** primitives in `src/components/ui/*` (including `Card` in `@/components/ui/card` and `Dialog` in `@/components/ui/dialog`). Never build ad-hoc inline-styled components or raw React Native `Modal`/card replacements when an RNR primitive exists; scaffold new RNR primitives via `npx @react-native-reusables/cli@latest add <component>` and immediately adapt them to Lucid Up's tokens.
-- **Zero borders & zero shadows**: Never use borders, border colors, outline rings, box/elevation shadows, or decorative divider lines anywhere. Separate elements with whitespace, padding, typography hierarchy, and subtle surface shifts.
-- **Strict tokens & 3-role typography**: Use only centralized tokens (`global.css`, `tailwind.config.js`, `src/lib/theme.ts`) and `cn()` from `@/lib/utils`. Use `@/components/ui/text` (`title` | `text` | `subtext`) instead of React Native `Text`. Never hardcode hex values, arbitrary font sizes/radii/spacing, or unapproved saturated colors; keep soft purple strictly as an accent.
-- **Mobile & RTL hygiene**: Reuse `@/components/ui/*` primitives, ensure `min-h-12` touch targets, `SafeAreaView` (`react-native-safe-area-context`), `KeyboardAvoidingView` + `keyboardShouldPersistTaps="handled"` on editors/forms, accessible roles/labels, and logical spacing (`ps-`/`pe-`/`ms-`/`me-`, no hardcoded `text-left`).
-- **Swipeable cards (`react-native-reanimated`)**: Interactive/actionable `Card` components (`SwipeableCard` wrapping RNR `Card` in `@/components/ui/card`) must support horizontal swipe-to-reveal actions using `react-native-reanimated` (with `react-native-gesture-handler`), keeping revealed actions borderless, shadowless, RTL-aware, and compliant with touch-target and token rules.
-- **Confirm dialogs for important actions**: Every important, mutating, or destructive action (e.g., `edit`, `delete`) must display a confirmation dialog (`ConfirmDialog` built on RNR `Dialog` in `@/components/ui/dialog`) and execute only after explicit user confirmation.
+| Domain / Task | Rules & Skills | Key References |
+|---|---|---|
+| Feature modules & boundaries | `.agents/rules/architecture-and-boundaries.md`, `feature-development` | `src/features/`, `src/shared/` |
+| State, queries & forms | `.agents/rules/state-and-data-fetching.md`, `tanstack-query-data`, `forms-with-rhf-valibot`, `zustand-client-state` | `src/shared/infrastructure/query/`, `src/shared/components/form/` |
+| UI, tokens, RNR & RTL/LTR | `.agents/rules/expo-and-ui.md`, `ui-ux-design-principles`, `design-system-tokens`, `nativewind-reusables-components` | [docs/design-system/README.md](docs/design-system/README.md), [components.json](components.json) |
+| Testing & code quality | `.agents/rules/code-quality-and-testing.md`, `testing-and-verification` | `vitest.config.mts`, `src/**/*.test.ts` |
+| Supabase & Postgres | `supabase`, `supabase-postgres-best-practices` | [supabase/config.jsonc](supabase/config.jsonc), [src/shared/infrastructure/supabase/client.ts](src/shared/infrastructure/supabase/client.ts) |
 
-### 3. Supabase & Postgres
-- **Imperative migrations**: This project uses imperative migrations in `supabase/migrations/` (`schema_paths: []` in [supabase/config.jsonc](supabase/config.jsonc)). Iterate with `execute_sql` (MCP) / `supabase db query` (CLI), then pull/commit clean migrations and regenerate TypeScript types (`npm run db:types` -> `src/types/database.types.ts`).
-- **Security**: Enable RLS on all `public` tables, target `TO authenticated` / `TO anon` with `(select auth.uid())` (never deprecated `auth.role()` or editable `user_metadata` in authorization), and never expose `service_role` keys to client code.
+## Non-Negotiable Constraints
+
+1. **Expo SDK 58 & CNG**: Verify SDK 58 docs (`https://docs.expo.dev/versions/v58.0.0/`) before using Expo/RN APIs. Install packages with `npx expo install <package>`. Never hand-edit `ios/` or `android/` when using CNG; configure native behavior in [app.json](app.json).
+2. **Design System**: Style exclusively with NativeWind v4 (`className` + `cn()` from `@/shared/lib/utils`), `@/shared/components/ui/*` (RNR), `@/shared/components/ui/text` (`title` | `text` | `subtext`), and centralized tokens (`global.css`, `tailwind.config.js`, `src/shared/lib/theme.ts`). Enforce **zero borders, zero shadows, zero divider lines**, `min-h-12` touch targets, `SafeAreaView`, `KeyboardAvoidingView`, RTL-safe logical spacing (`ps-`/`pe-`), `SwipeableCard` (`react-native-reanimated`), and `ConfirmDialog` before important/destructive actions (`edit`, `delete`).
+3. **Supabase & Postgres**: Project uses imperative migrations in `supabase/migrations/` (`schema_paths: []` in [supabase/config.jsonc](supabase/config.jsonc)) targeting project `isjafkdnfwtscabinzyh`. On every DB change: create an idempotent migration, push/apply to remote, verify tables/migrations + run advisors + run a test query, and regenerate `src/shared/types/database.types.ts` via `npm run db:types` (or report the exact blocker if remote sync fails). Enable RLS on all `public` tables using `(select auth.uid())`, and never expose `service_role` keys to client code.
 
 ## Commands & Verification
 
 ```bash
-npx expo install <package>   # Install SDK-compatible packages
-npx expo start               # Start dev server
-npm run lint                 # Run ESLint (expo lint)
-npx tsc --noEmit             # Run TypeScript typecheck
-npx expo-doctor              # Diagnose dependency/config issues
-npm run db:push              # Push migrations to linked Supabase project
-npm run db:types             # Regenerate src/types/database.types.ts
-npm run supabase:config:push # Push Supabase config changes
+npx expo install <package>              # Install SDK-compatible packages
+npx expo start                          # Start dev server
+npm run typecheck                       # Run TypeScript check (tsc --noEmit)
+npm run lint                            # Run ESLint (expo lint)
+npm test                                # Run Vitest unit tests (vitest run)
+npx expo-doctor                         # Diagnose dependency/config issues
+npm run db:link                         # Link CLI to Supabase project isjafkdnfwtscabinzyh
+npm run db:start                        # Start local Supabase stack
+npm run db:stop                         # Stop local Supabase stack
+npm run db:reset                        # Reset local DB to current migrations
+npm run db:migrations                   # List remote & local migrations
+npm run db:migration:new -- <name>      # Create a new timestamped migration file
+npm run db:push                         # Push migrations to remote Supabase project
+npm run db:pull                         # Pull remote schema into a migration
+npm run db:diff                         # Diff local vs remote schema
+npm run db:query -- "<sql>"             # Run SQL against remote database
+npm run db:advisors                     # Run Supabase security & performance advisors
+npm run db:types                        # Regenerate src/shared/types/database.types.ts
+npm run supabase:config:push            # Push Supabase config.jsonc changes
 ```
 
-- **Before declaring any task done**: Run `npm run lint` and `npx tsc --noEmit`.
-- **After UI token changes**: Also validate Tailwind compilation (`design-system-tokens`) and update `docs/design-system/` if an approved global change was made.
-- **After Supabase schema/RLS changes**: Run `supabase db advisors` (or MCP `get_advisors`), verify with a test query, and run `npm run db:types`.
+- **Before declaring any task done**: Run `npm run typecheck`, `npm run lint`, and `npm test`.
+- **After UI token changes**: Validate Tailwind compilation (`design-system-tokens`) and update `docs/design-system/`.
+- **After Supabase schema/RLS changes**: Sync remote migrations, run advisors + verification query, and regenerate `src/shared/types/database.types.ts`.

@@ -19,14 +19,14 @@ Apply Lucid Up's calm, minimal, editorial journal aesthetic to all screens and f
    - Separate unrelated sections with generous whitespace (`gap-8` or `gap-10`), and keep screen margins comfortable (`px-6`).
 
 2. **Enforce Journal-First Hierarchy**
-   - Use strictly the 3 typography roles via `<Text variant="title | text | subtext" />` from `@/components/ui/text`.
+   - Use strictly the 3 typography roles via `<Text variant="title | text | subtext" />` from `@/shared/components/ui/text`.
    - Reserve soft purple (`bg-accent-soft`, `text-accent-foreground`, `bg-accent`) strictly for selected states, subtle highlights, and important accents—never as the dominant surface or default CTA fill.
    - Keep journal editors open, padded, and distraction-free; keep entry lists separated by whitespace rather than bordered cards.
 
 3. **Verify Interaction, Accessibility & RTL/LTR**
-   - Ensure interactive elements meet comfortable touch targets (`min-h-12` / `>= 44–48px`) and always style with NativeWind v4 + React Native Reusables (`@/components/ui/*`, including `Card` and `Dialog`).
+   - Ensure interactive elements meet comfortable touch targets (`min-h-12` / `>= 44–48px`) and always style with NativeWind v4 + React Native Reusables (`@/shared/components/ui/*`, including `Card` and `Dialog`).
    - Use `SwipeableCard` wrapping RNR `Card` (`react-native-reanimated`) when a `Card` exposes contextual item actions (e.g., `edit`, `delete`), keeping revealed actions borderless, shadowless, and RTL-aware (`I18nManager.isRTL`).
-   - Gate every important, mutating, or destructive action (such as `edit` and `delete`) behind `ConfirmDialog` (built on RNR `Dialog` in `@/components/ui/dialog`), executing the action only after explicit user confirmation.
+   - Gate every important, mutating, or destructive action (such as `edit` and `delete`) behind `ConfirmDialog` (built on RNR `Dialog` in `@/shared/components/ui/dialog`), executing the action only after explicit user confirmation.
    - Wrap screens in `SafeAreaView` (`react-native-safe-area-context`) and pair inputs/editors with `KeyboardAvoidingView` and `ScrollView` (`keyboardShouldPersistTaps="handled"`).
    - Use RTL-safe logical utilities (`ps-*`, `pe-*`, `ms-*`, `me-*`) and omit explicit `text-left` so React Native aligns text naturally for both LTR and RTL (e.g., Persian) scripts.
    - Add `accessibilityLabel`, `role` / `accessibilityRole` (`"alert"` for errors), and `accessibilityState` where appropriate.

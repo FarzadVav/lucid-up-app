@@ -1,6 +1,6 @@
 import { Redirect, Stack } from 'expo-router';
-import { THEME, TYPOGRAPHY } from '@/lib/theme';
-import { useAuth } from '@/providers/auth-provider';
+import { useAuth } from '@/features/auth';
+import { THEME, TYPOGRAPHY } from '@/shared/lib/theme';
 
 export default function UserLayout() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -27,6 +27,11 @@ export default function UserLayout() {
         },
       }}
     >
+      <Stack.Screen name="journals/index" options={{ headerShown: false }} />
+      <Stack.Screen name="journals/new" options={{ headerShown: false }} />
+      <Stack.Screen name="journals/[journalId]" options={{ headerShown: false }} />
+      <Stack.Screen name="journals/categories/new" options={{ headerShown: false }} />
+      <Stack.Screen name="journals/categories/[categoryId]" options={{ headerShown: false }} />
       <Stack.Screen name="profile" options={{ title: 'Profile' }} />
     </Stack>
   );

@@ -17,8 +17,8 @@ Lucid Up is a personal journal writing application. Every visual and interaction
 5. **Single Source of Truth**: All visual tokens live in:
    - [global.css](../../global.css) (HSL CSS variables)
    - [tailwind.config.js](../../tailwind.config.js) (enforced NativeWind utilities)
-   - [src/lib/theme.ts](../../src/lib/theme.ts) (JS/React Navigation tokens)
-   - [src/lib/utils.ts](../../src/lib/utils.ts) (`cn()` with custom `font-size` merge group)
+   - [src/shared/lib/theme.ts](../../src/shared/lib/theme.ts) (JS/React Navigation tokens)
+   - [src/shared/lib/utils.ts](../../src/shared/lib/utils.ts) (`cn()` with custom `font-size` merge group)
 
 ## Documentation Index
 
@@ -27,6 +27,6 @@ Lucid Up is a personal journal writing application. Every visual and interaction
 
 ## Governance & Change Process
 
-- Every screen, feature, and component must reuse existing tokens and `src/components/ui/*` primitives.
+- Every screen, feature, and component must reuse existing tokens and `src/shared/components/ui/*` primitives.
 - Never introduce ad-hoc colors, font sizes, spacing values, borders, or shadows in feature code.
 - If a new requirement genuinely conflicts with a rule, propose an explicit global design-system update: update the token files, update `docs/design-system/`, and audit existing screens for consistency.

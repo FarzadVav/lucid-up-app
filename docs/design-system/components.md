@@ -1,17 +1,17 @@
 # Component & UX Standards
 
-All reusable UI primitives live in `src/components/ui/` and are built on **React Native Reusables** + **NativeWind v4**, customized to enforce zero borders, zero shadows, our restrained palette, and the three-role typography system.
+All reusable UI primitives live in `src/shared/components/ui/` and are built on **React Native Reusables** + **NativeWind v4**, customized to enforce zero borders, zero shadows, our restrained palette, and the three-role typography system.
 
 ---
 
 ## 1. Foundational Components
 
-### Typography (`@/components/ui/text`)
-- Always import `Text` from `@/components/ui/text`, not `react-native`.
+### Typography (`@/shared/components/ui/text`)
+- Always import `Text` from `@/shared/components/ui/text`, not `react-native`.
 - Variants: `'title' | 'text' | 'subtext'` (default `'text'`).
 - Automatically integrates with `TextClassContext` inside `Button` and `Card`.
 
-### Buttons (`@/components/ui/button`)
+### Buttons (`@/shared/components/ui/button`)
 - Minimum `48px` height (`min-h-12`) for default touch targets (`min-h-10` only for compact secondary actions).
 - Radius: `rounded-md` (`16px`).
 - Variants:
@@ -21,13 +21,13 @@ All reusable UI primitives live in `src/components/ui/` and are built on **React
   - `ghost`: Transparent fill (`active:bg-surface`) with `#A6A0AE` `Text`. Use for low-emphasis actions.
 - Feedback uses subtle opacity (`active:opacity-85`) and disabled dimming (`opacity-50`), never borders or shadows.
 
-### Inputs & Writing Fields (`@/components/ui/input`)
+### Inputs & Writing Fields (`@/shared/components/ui/input`)
 - Surface-based boundaries: `bg-surface` (`#1C1A22`) at rest, shifting to `bg-surface-muted` (`#26232D`) on focus. Zero borders.
 - Radius: `rounded-sm` (`12px`), padding `px-4 py-3`, `min-h-12`.
 - Selection & cursor color: `THEME.accent` (`#A891C4`), with `keyboardAppearance="dark"`.
 - Multiline writing editors: use `multiline` without forcing a fixed `min-h-12` cap; allow comfortable vertical growth, generous padding, and `text-text` (`16px` / `26px` line height). In full-screen journal editors, prefer an open `bg-background` (`#121016`) writing canvas over nested boxes.
 
-### Cards / Surfaces (`@/components/ui/card`)
+### Cards / Surfaces (`@/shared/components/ui/card`)
 - Use `Card` (`bg-surface rounded-md p-6`) sparingly—**do not wrap every item in a card**.
 - Prefer whitespace (`gap-8`, `gap-10`) over boxed containers on open `#121016` backgrounds.
 - **Swipeable cards (`SwipeableCard`)**: When a `Card` exposes contextual item actions (such as `edit` or `delete`), it must support horizontal swipe-to-reveal using `react-native-reanimated` (paired with `react-native-gesture-handler` `Gesture.Pan()` / `Animated.View`).
@@ -39,12 +39,12 @@ All reusable UI primitives live in `src/components/ui/` and are built on **React
 
 ## 2. Standard UI Patterns
 
-### Dialogs & Modals (`@/components/ui/dialog`)
-- Always use React Native Reusables `Dialog` (`@/components/ui/dialog`, backed by `@rn-primitives/dialog` and `<PortalHost />` in `src/app/_layout.tsx`) styled with NativeWind v4.
+### Dialogs & Modals (`@/shared/components/ui/dialog`)
+- Always use React Native Reusables `Dialog` (`@/shared/components/ui/dialog`, backed by `@rn-primitives/dialog` and `<PortalHost />` in `src/app/_layout.tsx`) styled with NativeWind v4.
 - Backdrop: subtle translucent dark scrim (`bg-background/70`) without harsh blur clutter.
 - Container: `bg-surface` (`#1C1A22`), `rounded-lg` (`24px`), `p-6`, zero border, zero shadow.
 
-### Confirmation Dialogs (`@/components/ui/confirm-dialog`)
+### Confirmation Dialogs (`@/shared/components/ui/confirm-dialog`)
 - **Mandatory for important actions**: Every important, mutating, or destructive action—such as **edit** (e.g., entering/committing a sensitive edit) and **delete**—must use `ConfirmDialog` (built on RNR `Dialog`) before executing. The action runs **only** if the user explicitly confirms.
 - Structure: `DialogHeader` (`DialogTitle` + optional `DialogDescription`) + `DialogFooter` with two comfortable `min-h-12` RNR `Button` actions (`Cancel` with `variant="secondary"` inside `DialogClose`, and `Confirm` with `variant="default"` or `variant="accent"`).
 - Support backdrop tap or cancel button to dismiss without side effects, and keep `DialogPrimitive.Content` accessible.
@@ -54,7 +54,7 @@ All reusable UI primitives live in `src/components/ui/` and are built on **React
 - Respect `SafeAreaView` bottom insets and keyboard avoidance.
 
 ### Navigation (Stack & Tabs)
-- Stack headers must set `headerShadowVisible: false`, `headerStyle: { backgroundColor: THEME.background }`, and `THEME.foreground` tint via `NAV_THEME` in `src/lib/theme.ts`.
+- Stack headers must set `headerShadowVisible: false`, `headerStyle: { backgroundColor: THEME.background }`, and `THEME.foreground` tint via `NAV_THEME` in `src/shared/lib/theme.ts`.
 - Tabs (when added): quiet `bg-background` bar with zero top border/shadow; inactive items in `text-text-secondary`, active/selected item highlighted with `text-accent-foreground` or `bg-accent-soft` pill.
 
 ### Lists & Journal Entries

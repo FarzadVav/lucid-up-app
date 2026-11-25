@@ -138,12 +138,14 @@ Use this when the project does not use declarative schemas.
 
 Do NOT use `apply_migration` to change a local database schema — it writes a migration history entry on every call, which means you can't iterate, and `supabase db diff` / `supabase db pull` will produce empty or conflicting diffs. If you use it, you'll be stuck with whatever SQL you passed on the first try.
 
-**When ready to commit** your changes to a migration file:
+**When ready to commit** your changes to a migration file (and **always required** on Lucid Up database tasks):
 
-1. **Run advisors** → `supabase db advisors` (CLI v2.81.3+) or MCP `get_advisors`. Fix any issues.
-2. **Review the Security Checklist above** if your changes involve views, functions, triggers, or storage.
-3. **Generate the migration** → `supabase db pull <descriptive-name> --local --yes`
-4. **Verify** → `supabase migration list --local`
+1. **Create/finalize the migration** → `npm run db:migration:new -- <descriptive-name>` (keep SQL idempotent where applicable).
+2. **Apply/push to remote (`isjafkdnfwtscabinzyh`)** → `npm run db:push` (or `npx supabase db push --remote="<pooler-url>"` on IPv4-only networks, or MCP `apply_migration`).
+3. **Run advisors** → `npm run db:advisors` (CLI v2.81.3+) or MCP `get_advisors`. Fix any issues.
+4. **Review the Security Checklist above** if your changes involve views, functions, triggers, or storage.
+5. **Verify** → `npm run db:migrations` and `npm run db:query` (or MCP `list_tables` / `execute_sql`).
+6. **Regenerate TypeScript types** → `npm run db:types` (`src/types/database.types.ts`) or MCP `generate_typescript_types`.
 
 ## Debugging
 
