@@ -1,16 +1,11 @@
 import { Redirect } from 'expo-router';
 import { useState } from 'react';
-import {
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Text } from '@/components/ui/text';
+import { THEME } from '@/lib/theme';
 import { useAuth } from '@/providers/auth-provider';
 import { getAuthRedirectUrl } from '@/utils/auth-redirect';
 import { supabase } from '@/utils/supabase';
@@ -69,211 +64,97 @@ export default function LoginScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView className="flex-1 bg-background">
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.keyboardView}
+        className="flex-1"
       >
-        <View style={styles.card}>
-          <Text style={styles.eyebrow}>LUCID UP</Text>
-          <Text style={styles.title}>Sign in with Email</Text>
-          <Text style={styles.subtitle}>
-            Enter your email address and we will send you a magic link to sign in without a
-            password.
-          </Text>
-
-          {displayError ? (
-            <View style={styles.errorBox}>
-              <Text style={styles.errorText}>{displayError}</Text>
-            </View>
-          ) : null}
-
-          {sentToEmail ? (
-            <View style={styles.successBox}>
-              <Text style={styles.successTitle}>Check your inbox</Text>
-              <Text style={styles.successText}>
-                We sent a magic link to <Text style={styles.bold}>{sentToEmail}</Text>. Open the
-                link on this device to finish signing in.
+        <ScrollView
+          keyboardShouldPersistTaps="handled"
+          contentContainerClassName="flex-grow justify-center px-6 py-10"
+        >
+          <View className="w-full max-w-md self-center gap-8">
+            <View className="gap-3">
+              <Text variant="subtext" className="text-accent-foreground">
+                Lucid Up
               </Text>
-
-              <Pressable
-                onPress={handleSendMagicLink}
-                disabled={isSubmitting}
-                style={({ pressed }) => [
-                  styles.primaryButton,
-                  (pressed || isSubmitting) && styles.buttonDisabled,
-                ]}
-              >
-                {isSubmitting ? (
-                  <ActivityIndicator color="#FFFFFF" />
-                ) : (
-                  <Text style={styles.primaryButtonText}>Resend magic link</Text>
-                )}
-              </Pressable>
-
-              <Pressable onPress={handleReset} style={styles.secondaryButton}>
-                <Text style={styles.secondaryButtonText}>Use a different email</Text>
-              </Pressable>
+              <Text variant="title">Sign in with Email</Text>
+              <Text className="text-text-secondary">
+                Enter your email address and we will send you a magic link to sign in without a
+                password.
+              </Text>
             </View>
-          ) : (
-            <View style={styles.form}>
-              <Text style={styles.label}>Email address</Text>
-              <TextInput
-                value={email}
-                onChangeText={(value) => {
-                  setEmail(value);
-                  if (formError) setFormError(null);
-                  if (authError) clearAuthError();
-                }}
-                placeholder="you@example.com"
-                placeholderTextColor="#94A3B8"
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoCorrect={false}
-                autoComplete="email"
-                textContentType="emailAddress"
-                editable={!isSubmitting}
-                onSubmitEditing={handleSendMagicLink}
-                returnKeyType="send"
-                style={styles.input}
-              />
 
-              <Pressable
-                onPress={handleSendMagicLink}
-                disabled={isSubmitting}
-                style={({ pressed }) => [
-                  styles.primaryButton,
-                  (pressed || isSubmitting) && styles.buttonDisabled,
-                ]}
-              >
-                {isSubmitting ? (
-                  <ActivityIndicator color="#FFFFFF" />
-                ) : (
-                  <Text style={styles.primaryButtonText}>Send magic link</Text>
-                )}
-              </Pressable>
-            </View>
-          )}
-        </View>
+            {displayError ? (
+              <View className="rounded-sm bg-surface-muted p-4" accessibilityRole="alert">
+                <Text variant="subtext" className="text-foreground">
+                  {displayError}
+                </Text>
+              </View>
+            ) : null}
+
+            {sentToEmail ? (
+              <View className="gap-6">
+                <View className="gap-3 rounded-md bg-accent-soft p-6">
+                  <Text variant="title" className="text-accent-foreground">
+                    Check your inbox
+                  </Text>
+                  <Text>
+                    We sent a magic link to <Text className="font-semibold">{sentToEmail}</Text>.
+                    Open the link on this device to finish signing in.
+                  </Text>
+                </View>
+
+                <View className="gap-3">
+                  <Button onPress={handleSendMagicLink} disabled={isSubmitting}>
+                    {isSubmitting ? (
+                      <ActivityIndicator color={THEME.primaryForeground} />
+                    ) : (
+                      <Text>Resend magic link</Text>
+                    )}
+                  </Button>
+
+                  <Button variant="ghost" onPress={handleReset}>
+                    <Text>Use a different email</Text>
+                  </Button>
+                </View>
+              </View>
+            ) : (
+              <View className="gap-6">
+                <View className="gap-2">
+                  <Text variant="subtext">Email address</Text>
+                  <Input
+                    value={email}
+                    onChangeText={(value) => {
+                      setEmail(value);
+                      if (formError) setFormError(null);
+                      if (authError) clearAuthError();
+                    }}
+                    placeholder="you@example.com"
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    autoComplete="email"
+                    textContentType="emailAddress"
+                    editable={!isSubmitting}
+                    onSubmitEditing={handleSendMagicLink}
+                    returnKeyType="send"
+                    accessibilityLabel="Email address"
+                  />
+                </View>
+
+                <Button onPress={handleSendMagicLink} disabled={isSubmitting}>
+                  {isSubmitting ? (
+                    <ActivityIndicator color={THEME.primaryForeground} />
+                  ) : (
+                    <Text>Send magic link</Text>
+                  )}
+                </Button>
+              </View>
+            )}
+          </View>
+        </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#F8FAFC',
-  },
-  keyboardView: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  card: {
-    width: '100%',
-    maxWidth: 420,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 24,
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    gap: 12,
-  },
-  eyebrow: {
-    fontSize: 12,
-    fontWeight: '700',
-    letterSpacing: 1.2,
-    color: '#2563EB',
-  },
-  title: {
-    fontSize: 26,
-    fontWeight: '700',
-    color: '#0F172A',
-  },
-  subtitle: {
-    fontSize: 15,
-    lineHeight: 22,
-    color: '#475569',
-    marginBottom: 4,
-  },
-  form: {
-    gap: 12,
-    marginTop: 4,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1E293B',
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#CBD5E1',
-    borderRadius: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontSize: 16,
-    color: '#0F172A',
-    backgroundColor: '#FFFFFF',
-  },
-  primaryButton: {
-    backgroundColor: '#0F172A',
-    borderRadius: 10,
-    paddingVertical: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 4,
-  },
-  buttonDisabled: {
-    opacity: 0.7,
-  },
-  primaryButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  secondaryButton: {
-    paddingVertical: 10,
-    alignItems: 'center',
-  },
-  secondaryButtonText: {
-    color: '#475569',
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  errorBox: {
-    backgroundColor: '#FEF2F2',
-    borderColor: '#FECACA',
-    borderWidth: 1,
-    borderRadius: 10,
-    padding: 12,
-  },
-  errorText: {
-    color: '#B91C1C',
-    fontSize: 14,
-    lineHeight: 20,
-  },
-  successBox: {
-    backgroundColor: '#F0FDF4',
-    borderColor: '#BBF7D0',
-    borderWidth: 1,
-    borderRadius: 12,
-    padding: 16,
-    gap: 10,
-    marginTop: 4,
-  },
-  successTitle: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: '#166534',
-  },
-  successText: {
-    fontSize: 14,
-    lineHeight: 20,
-    color: '#15803D',
-  },
-  bold: {
-    fontWeight: '700',
-  },
-});

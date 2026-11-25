@@ -1,7 +1,13 @@
+import '../../global.css';
+
+import { PortalHost } from '@rn-primitives/portal';
 import { Stack } from 'expo-router';
+import { ThemeProvider } from 'expo-router/react-navigation';
 import * as SplashScreen from 'expo-splash-screen';
+import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
-import { ActivityIndicator, Platform, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Platform, View } from 'react-native';
+import { NAV_THEME, THEME } from '@/lib/theme';
 import { AuthProvider, useAuth } from '@/providers/auth-provider';
 
 void SplashScreen.preventAutoHideAsync();
@@ -21,14 +27,19 @@ function RootNavigator() {
     }
 
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#0F172A" />
+      <View className="flex-1 items-center justify-center bg-background">
+        <ActivityIndicator size="large" color={THEME.foreground} />
       </View>
     );
   }
 
   return (
-    <Stack screenOptions={{ headerShown: false }}>
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        contentStyle: { backgroundColor: THEME.background },
+      }}
+    >
       <Stack.Screen name="index" />
       <Stack.Protected guard={!isAuthenticated} redirectTo="/profile">
         <Stack.Screen name="login" options={{ title: 'Sign In' }} />
@@ -42,17 +53,12 @@ function RootNavigator() {
 
 export default function RootLayout() {
   return (
-    <AuthProvider>
-      <RootNavigator />
-    </AuthProvider>
+    <ThemeProvider value={NAV_THEME}>
+      <AuthProvider>
+        <StatusBar style="light" />
+        <RootNavigator />
+        <PortalHost />
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  loadingContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#F8FAFC',
-  },
-});

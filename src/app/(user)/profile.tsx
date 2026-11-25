@@ -1,14 +1,10 @@
 import { useState } from 'react';
-import {
-  ActivityIndicator,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import { ActivityIndicator, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Text } from '@/components/ui/text';
+import { THEME } from '@/lib/theme';
 import { useAuth } from '@/providers/auth-provider';
 
 export default function ProfileScreen() {
@@ -57,217 +53,95 @@ export default function ProfileScreen() {
   const displayEmail = profile?.email ?? user?.email ?? '';
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['bottom']}>
-      <ScrollView contentContainerStyle={styles.container}>
-        <View style={styles.card}>
-          <Text style={styles.sectionTitle}>Account</Text>
+    <SafeAreaView className="flex-1 bg-background" edges={['bottom']}>
+      <ScrollView
+        keyboardShouldPersistTaps="handled"
+        contentContainerClassName="px-6 py-8"
+      >
+        <View className="w-full max-w-lg self-center gap-10">
+          <View className="gap-6">
+            <Text variant="title">Account</Text>
 
-          <View style={styles.field}>
-            <Text style={styles.label}>Email</Text>
-            <View style={styles.readOnlyField}>
-              <Text style={styles.readOnlyText}>{displayEmail}</Text>
+            <View className="gap-2">
+              <Text variant="subtext">Email</Text>
+              <View className="min-h-12 justify-center rounded-sm bg-surface px-4 py-3">
+                <Text className="text-text-secondary">{displayEmail}</Text>
+              </View>
             </View>
-          </View>
 
-          <View style={styles.field}>
-            <Text style={styles.label}>Full name</Text>
-            <TextInput
-              value={fullName}
-              onChangeText={(value) => {
-                setDraftFullName(value);
-                if (statusMessage) setStatusMessage(null);
-              }}
-              placeholder="Add your name"
-              placeholderTextColor="#94A3B8"
-              autoCapitalize="words"
-              editable={!isSaving}
-              style={styles.input}
-            />
-          </View>
+            <View className="gap-2">
+              <Text variant="subtext">Full name</Text>
+              <Input
+                value={fullName}
+                onChangeText={(value) => {
+                  setDraftFullName(value);
+                  if (statusMessage) setStatusMessage(null);
+                }}
+                placeholder="Add your name"
+                autoCapitalize="words"
+                editable={!isSaving}
+                accessibilityLabel="Full name"
+              />
+            </View>
 
-          {statusMessage ? (
-            <View
-              style={[
-                styles.statusBox,
-                statusMessage.type === 'error' ? styles.errorBox : styles.successBox,
-              ]}
-            >
-              <Text
-                style={statusMessage.type === 'error' ? styles.errorText : styles.successText}
+            {statusMessage ? (
+              <View
+                className={
+                  statusMessage.type === 'error'
+                    ? 'rounded-sm bg-surface-muted p-4'
+                    : 'rounded-sm bg-accent-soft p-4'
+                }
+                accessibilityRole={statusMessage.type === 'error' ? 'alert' : 'text'}
               >
-                {statusMessage.text}
-              </Text>
-            </View>
-          ) : null}
+                <Text
+                  variant="subtext"
+                  className={
+                    statusMessage.type === 'error'
+                      ? 'text-foreground'
+                      : 'text-accent-foreground'
+                  }
+                >
+                  {statusMessage.text}
+                </Text>
+              </View>
+            ) : null}
 
-          <Pressable
-            onPress={handleSave}
-            disabled={isSaving}
-            style={({ pressed }) => [
-              styles.primaryButton,
-              (pressed || isSaving) && styles.buttonDisabled,
-            ]}
-          >
-            {isSaving ? (
-              <ActivityIndicator color="#FFFFFF" />
-            ) : (
-              <Text style={styles.primaryButtonText}>Save profile</Text>
-            )}
-          </Pressable>
-        </View>
-
-        <View style={styles.card}>
-          <Text style={styles.sectionTitle}>Session</Text>
-          <View style={styles.metaRow}>
-            <Text style={styles.metaLabel}>User ID</Text>
-            <Text style={styles.metaValue} selectable>
-              {user?.id ?? '—'}
-            </Text>
+            <Button onPress={handleSave} disabled={isSaving}>
+              {isSaving ? (
+                <ActivityIndicator color={THEME.primaryForeground} />
+              ) : (
+                <Text>Save profile</Text>
+              )}
+            </Button>
           </View>
-          {profile?.created_at ? (
-            <View style={styles.metaRow}>
-              <Text style={styles.metaLabel}>Member since</Text>
-              <Text style={styles.metaValue}>
-                {new Date(profile.created_at).toLocaleDateString()}
-              </Text>
-            </View>
-          ) : null}
 
-          <Pressable
-            onPress={handleSignOut}
-            disabled={isSigningOut}
-            style={({ pressed }) => [
-              styles.signOutButton,
-              (pressed || isSigningOut) && styles.buttonDisabled,
-            ]}
-          >
-            {isSigningOut ? (
-              <ActivityIndicator color="#B91C1C" />
-            ) : (
-              <Text style={styles.signOutButtonText}>Sign out</Text>
-            )}
-          </Pressable>
+          <View className="gap-6">
+            <Text variant="title">Session</Text>
+
+            <View className="gap-4">
+              <View className="gap-1">
+                <Text variant="subtext">User ID</Text>
+                <Text selectable>{user?.id ?? '—'}</Text>
+              </View>
+
+              {profile?.created_at ? (
+                <View className="gap-1">
+                  <Text variant="subtext">Member since</Text>
+                  <Text>{new Date(profile.created_at).toLocaleDateString()}</Text>
+                </View>
+              ) : null}
+            </View>
+
+            <Button variant="secondary" onPress={handleSignOut} disabled={isSigningOut}>
+              {isSigningOut ? (
+                <ActivityIndicator color={THEME.foreground} />
+              ) : (
+                <Text>Sign out</Text>
+              )}
+            </Button>
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#F8FAFC',
-  },
-  container: {
-    padding: 20,
-    gap: 16,
-    alignItems: 'center',
-  },
-  card: {
-    width: '100%',
-    maxWidth: 480,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 20,
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    gap: 14,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#0F172A',
-  },
-  field: {
-    gap: 6,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#334155',
-  },
-  readOnlyField: {
-    backgroundColor: '#F1F5F9',
-    borderRadius: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-  },
-  readOnlyText: {
-    fontSize: 15,
-    color: '#475569',
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#CBD5E1',
-    borderRadius: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontSize: 16,
-    color: '#0F172A',
-    backgroundColor: '#FFFFFF',
-  },
-  statusBox: {
-    borderRadius: 10,
-    padding: 12,
-    borderWidth: 1,
-  },
-  successBox: {
-    backgroundColor: '#F0FDF4',
-    borderColor: '#BBF7D0',
-  },
-  errorBox: {
-    backgroundColor: '#FEF2F2',
-    borderColor: '#FECACA',
-  },
-  successText: {
-    color: '#15803D',
-    fontSize: 14,
-  },
-  errorText: {
-    color: '#B91C1C',
-    fontSize: 14,
-  },
-  primaryButton: {
-    backgroundColor: '#0F172A',
-    borderRadius: 10,
-    paddingVertical: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  primaryButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  metaRow: {
-    gap: 2,
-  },
-  metaLabel: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#64748B',
-    textTransform: 'uppercase',
-  },
-  metaValue: {
-    fontSize: 14,
-    color: '#0F172A',
-  },
-  signOutButton: {
-    borderWidth: 1,
-    borderColor: '#FECACA',
-    backgroundColor: '#FEF2F2',
-    borderRadius: 10,
-    paddingVertical: 13,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 4,
-  },
-  signOutButtonText: {
-    color: '#B91C1C',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  buttonDisabled: {
-    opacity: 0.7,
-  },
-});

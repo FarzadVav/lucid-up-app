@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 260 15.8% 7.5%;
+    --foreground: 260 15.8% 96.3%;
+    --surface: 255 13.3% 11.8%;
+    --surface-muted: 258 12.5% 15.7%;
+    --text-secondary: 266 8% 65.5%;
+    --accent: 267 30.2% 66.9%;
+    --accent-soft: 261 20% 16.7%;
+    --accent-foreground: 265 41.8% 84.5%;
+    --primary: 260 15.8% 96.3%;
+    --primary-foreground: 260 15.8% 7.5%;
+  }
+}
