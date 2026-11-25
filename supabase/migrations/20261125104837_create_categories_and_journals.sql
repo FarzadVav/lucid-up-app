@@ -1,3 +1,6 @@
+-- Ensure users table has RLS enabled
+alter table if exists public.users enable row level security;
+
 -- Categories table
 create table if not exists public.categories (
   id uuid primary key default gen_random_uuid(),

@@ -1,5 +1,6 @@
 import type { EmailOtpType } from '@supabase/supabase-js';
 import * as Linking from 'expo-linking';
+import { Platform } from 'react-native';
 import { supabase } from '@/shared/infrastructure/supabase/client';
 
 const EMAIL_OTP_TYPES = new Set<EmailOtpType>([
@@ -11,6 +12,15 @@ const EMAIL_OTP_TYPES = new Set<EmailOtpType>([
 ]);
 
 export function getAuthRedirectUrl(): string {
+  if (Platform.OS === 'web') {
+    if (typeof window !== 'undefined' && window.location?.origin) {
+      return `${window.location.origin}/login`;
+    }
+    const fallbackSiteUrl =
+      process.env.EXPO_PUBLIC_SITE_URL || 'https://lucid-up-app.vercel.app';
+    return `${fallbackSiteUrl.replace(/\/$/, '')}/login`;
+  }
+
   return Linking.createURL('login');
 }
 

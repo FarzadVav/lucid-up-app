@@ -66,6 +66,44 @@ export type Database = {
         }
         Relationships: []
       }
+      journals: {
+        Row: {
+          category_id: string
+          content: string
+          created_at: string
+          id: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category_id: string
+          content?: string
+          created_at?: string
+          id?: string
+          title: string
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          category_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "journals_category_user_fkey"
+            columns: ["category_id", "user_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id", "user_id"]
+          },
+        ]
+      }
       users: {
         Row: {
           avatar_url: string | null
@@ -98,7 +136,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      delete_category: {
+        Args: { p_category_id: string }
+        Returns: {
+          default_category_id: string
+          deleted_category_id: string
+          moved_journals_count: number
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never

@@ -11,12 +11,33 @@
       "icon": "./assets/expo.icon"
     },
     "android": {
+      "package": "com.lucidup.app",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
+      "permissions": ["INTERNET", "ACCESS_NETWORK_STATE"],
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "lucid-up-app.vercel.app",
+              "pathPrefix": "/login"
+            },
+            {
+              "scheme": "https",
+              "host": "lucid-up-app.vercel.app",
+              "pathPrefix": "/auth"
+            }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ],
       "predictiveBackGestureEnabled": false
     },
     "web": {
@@ -47,7 +68,10 @@
       },
       "eas": {
         "projectId": "0f51bfd3-ddec-4a60-bbdf-3e3b89bcdbc5"
-      }
+      },
+      "supabaseUrl": "https://isjafkdnfwtscabinzyh.supabase.co",
+      "supabaseAnonKey": "sb_publishable_0AV_nJVJBJ-oWe4gMFTeWA_9qucNysh",
+      "siteUrl": "https://lucid-up-app.vercel.app"
     },
     "owner": "farzadvav"
   }

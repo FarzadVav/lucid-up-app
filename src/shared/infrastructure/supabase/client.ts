@@ -1,67 +1,20 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createClient, type SupportedStorage } from '@supabase/supabase-js';
+import Constants from 'expo-constants';
 import { Platform } from 'react-native';
 import type { Database } from '@/shared/types/database.types';
 
-/**
- * Extends generated `Database` with `journals` and `delete_category` from
- * local migration `20261125104837_create_categories_and_journals.sql` until
- * remote migrations are synced and `npm run db:types` is regenerated.
- */
-export type AppDatabase = Omit<Database, 'public'> & {
-  public: {
-    Tables: Database['public']['Tables'] & {
-      journals: {
-        Row: {
-          id: string;
-          user_id: string;
-          category_id: string;
-          title: string;
-          content: string;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: {
-          id?: string;
-          user_id?: string;
-          category_id: string;
-          title: string;
-          content?: string;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Update: {
-          id?: string;
-          user_id?: string;
-          category_id?: string;
-          title?: string;
-          content?: string;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Relationships: [];
-      };
-    };
-    Views: Database['public']['Views'];
-    Functions: Database['public']['Functions'] & {
-      delete_category: {
-        Args: {
-          p_category_id: string;
-        };
-        Returns: {
-          deleted_category_id: string;
-          default_category_id: string;
-          moved_journals_count: number;
-        }[];
-      };
-    };
-    Enums: Database['public']['Enums'];
-    CompositeTypes: Database['public']['CompositeTypes'];
-  };
-};
+export type AppDatabase = Database;
 
-const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.EXPO_PUBLIC_SUPABASE_KEY;
+const supabaseUrl =
+  process.env.EXPO_PUBLIC_SUPABASE_URL ||
+  (Constants.expoConfig?.extra?.supabaseUrl as string | undefined) ||
+  'https://isjafkdnfwtscabinzyh.supabase.co';
+
+const supabaseKey =
+  process.env.EXPO_PUBLIC_SUPABASE_KEY ||
+  (Constants.expoConfig?.extra?.supabaseAnonKey as string | undefined) ||
+  'sb_publishable_0AV_nJVJBJ-oWe4gMFTeWA_9qucNysh';
 
 if (!supabaseUrl || !supabaseKey) {
   throw new Error(

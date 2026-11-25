@@ -57,9 +57,9 @@
       // Configure one of the supported pooler modes: `transaction`, `session`.
       "pool_mode": "transaction",
       // How many server connections to allow per user/database pair.
-      "default_pool_size": 20,
+      "default_pool_size": 15,
       // Maximum number of client connections allowed.
-      "max_client_conn": 100
+      "max_client_conn": 200
     },
 
     // "vault": {
@@ -171,7 +171,7 @@
 
     // Store vector embeddings in S3 for large and durable datasets
     "vector": {
-      "enabled": true,
+      "enabled": false,
       "max_buckets": 10,
       "max_indexes": 5,
 
@@ -186,11 +186,20 @@
     "enabled": true,
     // The base URL of your website. Used as an allow-list for redirects and for constructing URLs used
     // in emails.
-    "site_url": "http://localhost:8081",
+    "site_url": "https://lucid-up-app.vercel.app",
     // The public URL that Auth serves on. Defaults to the API external URL with `/auth/v1` appended.
     // "external_url": "",
     // A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
-    "additional_redirect_urls": ["http://localhost:8081/**", "lucidup://**"],
+    "additional_redirect_urls": [
+      "https://lucid-up-app.vercel.app/**",
+      "https://lucid-up-app.vercel.app/login",
+      "http://localhost:8081/**",
+      "http://localhost:8081/login",
+      "http://localhost:3000/**",
+      "lucidup://**",
+      "lucidup://login",
+      "com.lucidup.app://**"
+    ],
     // How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 (1 week).
     "jwt_expiry": 3600,
     // JWT issuer URL. If not set, defaults to auth.external_url.

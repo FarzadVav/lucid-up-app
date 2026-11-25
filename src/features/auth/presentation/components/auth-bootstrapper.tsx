@@ -31,13 +31,23 @@ export function AuthBootstrapper({ children }: PropsWithChildren) {
           const urlError = urlParams.error_description || urlParams.error;
           if (urlError && isMounted) {
             setAuthError(urlError);
-          } else if (urlParams.token_hash && urlParams.type) {
+          } else if (
+            (urlParams.access_token && urlParams.refresh_token) ||
+            urlParams.code ||
+            (urlParams.token_hash && urlParams.type)
+          ) {
             const { error: verifyError } = await restoreSessionFromUrlUseCase(
               supabaseAuthRepository,
               window.location.href
             );
             if (verifyError && isMounted) {
               setAuthError(verifyError);
+            } else if (
+              !verifyError &&
+              typeof window !== 'undefined' &&
+              window.history?.replaceState
+            ) {
+              window.history.replaceState({}, document.title, window.location.pathname);
             }
           }
         }
