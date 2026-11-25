@@ -30,15 +30,24 @@ All reusable UI primitives live in `src/components/ui/` and are built on **React
 ### Cards / Surfaces (`@/components/ui/card`)
 - Use `Card` (`bg-surface rounded-md p-6`) sparingly—**do not wrap every item in a card**.
 - Prefer whitespace (`gap-8`, `gap-10`) over boxed containers on open `#121016` backgrounds.
+- **Swipeable cards (`SwipeableCard`)**: When a `Card` exposes contextual item actions (such as `edit` or `delete`), it must support horizontal swipe-to-reveal using `react-native-reanimated` (paired with `react-native-gesture-handler` `Gesture.Pan()` / `Animated.View`).
+  - Keep revealed actions calm, borderless, and shadowless (`bg-surface-muted` for neutral/edit actions, `bg-accent-soft` with `text-accent-foreground` for highlighted/important actions), with `rounded-md` or `rounded-sm` and `min-h-12` (`>= 48px`) touch targets.
+  - Respect RTL/LTR directionality (`I18nManager.isRTL`) so swipe reveal and action alignment feel natural in both Persian and English.
+  - Snap smoothly with Reanimated spring/timing physics and close automatically after an action is triggered.
 
 ---
 
 ## 2. Standard UI Patterns
 
-### Dialogs & Modals
-- Use `@rn-primitives/dialog` with `<PortalHost />` (already mounted in `src/app/_layout.tsx`).
+### Dialogs & Modals (`@/components/ui/dialog`)
+- Always use React Native Reusables `Dialog` (`@/components/ui/dialog`, backed by `@rn-primitives/dialog` and `<PortalHost />` in `src/app/_layout.tsx`) styled with NativeWind v4.
 - Backdrop: subtle translucent dark scrim (`bg-background/70`) without harsh blur clutter.
-- Container: `bg-surface` (`#1C1A22`) or `bg-surface-muted` (`#26232D`), `rounded-lg` (`24px`), `p-6`, zero border, zero shadow.
+- Container: `bg-surface` (`#1C1A22`), `rounded-lg` (`24px`), `p-6`, zero border, zero shadow.
+
+### Confirmation Dialogs (`@/components/ui/confirm-dialog`)
+- **Mandatory for important actions**: Every important, mutating, or destructive action—such as **edit** (e.g., entering/committing a sensitive edit) and **delete**—must use `ConfirmDialog` (built on RNR `Dialog`) before executing. The action runs **only** if the user explicitly confirms.
+- Structure: `DialogHeader` (`DialogTitle` + optional `DialogDescription`) + `DialogFooter` with two comfortable `min-h-12` RNR `Button` actions (`Cancel` with `variant="secondary"` inside `DialogClose`, and `Confirm` with `variant="default"` or `variant="accent"`).
+- Support backdrop tap or cancel button to dismiss without side effects, and keep `DialogPrimitive.Content` accessible.
 
 ### Bottom Sheets
 - Radius: `rounded-t-lg` (`24px` top corners), `bg-surface` (`#1C1A22`), generous internal padding (`px-6 pt-6 pb-8`), optional quiet drag handle (`bg-surface-muted rounded-full`) with no borders or shadows.

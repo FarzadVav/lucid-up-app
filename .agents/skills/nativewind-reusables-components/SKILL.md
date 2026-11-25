@@ -9,22 +9,23 @@ description: >-
 
 # NativeWind & React Native Reusables Components
 
-Lucid Up uses **NativeWind v4** (`4.2.7`) and **React Native Reusables** (`new-york` style, configured in [components.json](../../../components.json)) with `<PortalHost />` mounted in [src/app/_layout.tsx](../../../src/app/_layout.tsx).
+Lucid Up uses **NativeWind v4** (`4.2.7`) and **React Native Reusables** (`new-york` style, configured in [components.json](../../../components.json)) with `<PortalHost />` mounted in [src/app/_layout.tsx](../../../src/app/_layout.tsx). **Always use NativeWind and React Native Reusables (`@/components/ui/*`, including `Card` and `Dialog`) for all styling and UI primitives.**
 
 ## Procedure for Adding or Building a UI Component
 
 1. **Check Existing Primitives First**
-   - Inspect `src/components/ui/` before creating anything new. Never create duplicate component variants.
+   - Inspect `src/components/ui/` before creating anything new. Never create duplicate component variants or hand-roll raw React Native `Modal`/card primitives when an RNR primitive exists.
    - If scaffolding a new primitive from RNR: `npx @react-native-reusables/cli@latest add <component>`.
 
 2. **Adapt Immediately to Lucid Up's Design System**
-   Default RNR templates include borders, shadows, focus rings, and 10+ text variants. Always customize newly added components before using them:
+   Default RNR templates include borders, shadows, focus rings, uninstalled icon imports (`lucide-react-native`), and 10+ text variants. Always customize newly added components before using them:
    - **Remove all borders, shadows, and rings**: Strip `border`, `border-*`, `shadow-*`, `ring-*`, `focus-visible:border-ring`, `focus-visible:ring-*`.
    - **Map semantic colors**: Use only `bg-background`, `bg-surface`, `bg-surface-muted`, `bg-primary`, `bg-accent-soft`, `bg-accent`, `text-foreground`, `text-text-secondary`, `text-primary-foreground`, `text-accent-foreground`.
    - **Enforce 3-role typography**: Replace RNR `Text` imports or font-size classes with `<Text variant="title | text | subtext" />` from `@/components/ui/text` (`TextClassContext` compatible).
    - **Enforce radii & spacing**: Use only `rounded-sm` (`12px`), `rounded-md` (`16px`), `rounded-lg` (`24px`), `rounded-full` (`9999px`) and `min-h-12` (`48px`) touch targets on interactive controls.
    - **Use `cn()` from `@/lib/utils`**: Ensures `text-title`/`text-text`/`text-subtext` merge safely with text color utilities.
-   - **Keep dependencies minimal**: Only add `@rn-primitives/*` packages required by the specific component being added.
+   - **Swipeable cards & confirmation dialogs**: Build swipe-to-reveal `Card` interactions (`SwipeableCard` wrapping RNR `Card` in `@/components/ui/card`) with `react-native-reanimated` + `react-native-gesture-handler`, and gate important/destructive actions (`edit`, `delete`) behind `ConfirmDialog` (`@/components/ui/confirm-dialog`) built on RNR `Dialog` (`@/components/ui/dialog`).
+   - **Keep dependencies minimal**: Only add `@rn-primitives/*` packages required by the specific component being added, and remove unused template imports (e.g., `lucide-react-native`) if not installed.
 
 3. **Verify**
    - Run `npx expo lint` and `npx tsc --noEmit`.

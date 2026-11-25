@@ -7,6 +7,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { ActivityIndicator, Platform, View } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { NAV_THEME, THEME } from '@/lib/theme';
 import { AuthProvider, useAuth } from '@/providers/auth-provider';
 
@@ -53,12 +54,14 @@ function RootNavigator() {
 
 export default function RootLayout() {
   return (
-    <ThemeProvider value={NAV_THEME}>
-      <AuthProvider>
-        <StatusBar style="light" />
-        <RootNavigator />
-        <PortalHost />
-      </AuthProvider>
-    </ThemeProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ThemeProvider value={NAV_THEME}>
+        <AuthProvider>
+          <StatusBar style="light" />
+          <RootNavigator />
+          <PortalHost />
+        </AuthProvider>
+      </ThemeProvider>
+    </GestureHandlerRootView>
   );
 }
